@@ -292,26 +292,13 @@ textarea.field{resize:none;font-family:'JetBrains Mono',monospace;font-size:12px
             spellcheck="false"></textarea>
           <div class="paste-placeholder" id="paste-ph">
             <div class="paste-placeholder-icon">📋</div>
-            <div class="paste-placeholder-text">วาง HTML ที่ได้จาก Claude<br>แล้วกด Analyze</div>
+            <div class="paste-placeholder-text">วาง HTML ที่ได้จาก Claude<br>แล้วกรอกชื่อด้านล่าง</div>
           </div>
         </div>
         <div class="code-meta">
           <span class="char-count" id="char-count">0 chars</span>
           <button class="btn-clear-code" onclick="clearCode()">ล้าง</button>
         </div>
-      </div>
-
-      <!-- Analyze Button -->
-      <div class="btn-row">
-        <button class="btn btn-secondary" id="btn-analyze" disabled onclick="analyze()">
-          <span id="analyze-label">✨ Analyze ด้วย AI</span>
-        </button>
-      </div>
-
-      <!-- AI Badge -->
-      <div class="ai-badge" id="ai-badge">
-        <span class="ai-badge-dot"></span>
-        <span>AI กรอกให้อัตโนมัติแล้ว — แก้ได้ตามต้องการ</span>
       </div>
 
       <!-- Title -->
@@ -370,19 +357,6 @@ textarea.field{resize:none;font-family:'JetBrains Mono',monospace;font-size:12px
     <div class="settings-body">
 
       <div class="settings-card">
-        <h3>✨ Gemini API Key</h3>
-        <p>ใช้สำหรับ Analyze HTML อัตโนมัติ — ได้ฟรีที่ <strong>aistudio.google.com</strong></p>
-        <div id="key-status-wrap" style="display:none">
-          <div class="key-display" id="key-display"></div>
-          <button class="btn btn-danger" onclick="clearApiKey()">🗑️ ลบ API Key</button>
-        </div>
-        <div id="key-input-wrap">
-          <input class="field" id="apikey-input" type="password" placeholder="AIzaSy..." style="margin-bottom:10px">
-          <button class="btn btn-primary" onclick="saveApiKey()">💾 บันทึก API Key</button>
-        </div>
-      </div>
-
-      <div class="settings-card">
         <h3>📦 ข้อมูลทั้งหมด</h3>
         <p>ข้อมูลทั้งหมดเก็บใน browser นี้เท่านั้น ไม่ sync ข้ามเครื่อง ถ้าล้าง browser data ข้อมูลจะหายไป</p>
         <div class="divider-line" style="margin-bottom:12px"></div>
@@ -394,9 +368,9 @@ textarea.field{resize:none;font-family:'JetBrains Mono',monospace;font-size:12px
         <p style="margin:0">
           1. ได้ HTML จาก Claude<br>
           2. กด + แล้ววาง HTML ลงไป<br>
-          3. กด Analyze ให้ AI ตั้งชื่อให้<br>
+          3. กรอกชื่อ / tag / คำอธิบาย<br>
           4. กด บันทึก → ปรากฏในห้องสมุด<br>
-          5. กดค้างที่ card เพื่อ Preview / Copy / Delete
+          5. กดที่ card เพื่อ Preview / Copy / Delete
         </p>
       </div>
 
@@ -521,7 +495,6 @@ function onCodeChange() {
   const wrap = document.getElementById('paste-zone-wrap');
   document.getElementById('char-count').textContent = val.length.toLocaleString() + ' chars';
   wrap.classList.toggle('filled', val.length > 0);
-  document.getElementById('btn-analyze').disabled = val.trim().length < 10;
 }
 
 function clearCode() {
@@ -531,59 +504,6 @@ function clearCode() {
   document.getElementById('desc-input').value = '';
   document.getElementById('char-count').textContent = '0 chars';
   document.getElementById('paste-zone-wrap').classList.remove('filled');
-  document.getElementById('btn-analyze').disabled = true;
-  document.getElementById('ai-badge').classList.remove('show');
-}
-
-async function analyze() {
-  const apiKey = localStorage.getItem(APIKEY_KEY);
-  if (!apiKey) { goTo('s-settings'); toast('⚙️ กรุณาตั้งค่า API Key ก่อน'); return; }
-
-  const code = document.getElementById('code-input').value.slice(0, 3000);
-  const btn = document.getElementById('btn-analyze');
-  const lbl = document.getElementById('analyze-label');
-
-  btn.disabled = true;
-  lbl.innerHTML = '<div class="spinner"></div> กำลังวิเคราะห์...';
-
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text:
-              `วิเคราะห์ HTML นี้แล้วตอบเป็น JSON เท่านั้น ไม่ต้องมี markdown หรือ backtick:
-{"title":"ชื่อสั้นภาษาไทย 3-5 คำ","tag":"หมวดหมู่ lowercase 1 คำเช่น learn finance tool dev","desc":"อธิบายสั้นๆ 1 ประโยคภาษาไทย"}
-
-HTML:
-${code}` }]
-          }],
-          generationConfig: { temperature: 0.2, maxOutputTokens: 200 }
-        })
-      }
-    );
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'API Error');
-
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const clean = text.replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(clean);
-
-    document.getElementById('title-input').value = parsed.title || '';
-    document.getElementById('tag-input').value   = (parsed.tag || '').toLowerCase().replace(/\s/g,'');
-    document.getElementById('desc-input').value  = parsed.desc || '';
-    document.getElementById('ai-badge').classList.add('show');
-    toast('✨ AI วิเคราะห์เสร็จแล้ว');
-  } catch(e) {
-    toast('❌ Error: ' + (e.message || 'ไม่สามารถวิเคราะห์ได้'));
-  } finally {
-    btn.disabled = false;
-    lbl.textContent = '✨ Analyze ด้วย AI';
-    onCodeChange();
-  }
 }
 
 function saveDoc() {
@@ -665,36 +585,9 @@ function delDoc(id) {
 
 /* ── SETTINGS ──────────────────────────────────────────── */
 function renderSettings() {
-  const key = localStorage.getItem(APIKEY_KEY);
-  const kwrap = document.getElementById('key-input-wrap');
-  const kstatus = document.getElementById('key-status-wrap');
-  if (key) {
-    kstatus.style.display = 'block';
-    kwrap.style.display = 'none';
-    document.getElementById('key-display').textContent = key.slice(0,8) + '••••••••••••••••••' + key.slice(-4);
-  } else {
-    kstatus.style.display = 'none';
-    kwrap.style.display = 'block';
-  }
   const size = new Blob([localStorage.getItem(STORAGE_KEY)||'']).size;
   document.getElementById('storage-info').textContent =
     `${docs.length} เอกสาร · ${(size/1024).toFixed(1)} KB`;
-}
-
-function saveApiKey() {
-  const key = document.getElementById('apikey-input').value.trim();
-  if (!key) { toast('⚠️ กรุณาใส่ API Key'); return; }
-  localStorage.setItem(APIKEY_KEY, key);
-  document.getElementById('apikey-input').value = '';
-  renderSettings();
-  toast('✅ บันทึก API Key แล้ว');
-}
-
-function clearApiKey() {
-  if (!confirm('ลบ API Key?')) return;
-  localStorage.removeItem(APIKEY_KEY);
-  renderSettings();
-  toast('🗑️ ลบ API Key แล้ว');
 }
 
 /* ── TOAST ─────────────────────────────────────────────── */
