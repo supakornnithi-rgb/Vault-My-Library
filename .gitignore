@@ -1,0 +1,2 @@
+# Local-only Firebase admin config used by scripts/*.mjs — never commit real credentials.
+.vault-admin-config.local.json

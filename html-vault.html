@@ -2,612 +2,782 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HTML Vault</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="description" content="ห้องสมุด HTML page ส่วนตัว">
+<meta name="theme-color" content="#080c14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vault">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
-/* ── RESET & BASE ─────────────────────────────────────── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#080c14;--surface:#0f1623;--surface2:#161d2e;--surface3:#1e2840;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
-  --text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;
-  --accent:#f59e0b;--accent-dim:rgba(245,158,11,0.12);
-  --green:#34d399;--red:#f87171;--blue:#60a5fa;
-  --radius:14px;--radius-sm:8px;
-  --safe-bottom:env(safe-area-inset-bottom,0px);
-}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:16px;}
+  :root{
+    --bg:#080c14;
+    --bg-elev:#0d1220;
+    --card-bg:#10151f;
+    --card-hover:#141a28;
+    --border:#1c2333;
+    --accent:#f59e0b;
+    --accent-ink:#1a1204;
+    --accent-dim:rgba(245,158,11,.14);
+    --text:#e8ecf4;
+    --text-dim:#8992a8;
+    --text-faint:#5c657a;
+    --danger:#ef4444;
+    --ok:#22c55e;
+    --font-display:'Syne',sans-serif;
+    --font-body:'Outfit',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+    --radius:16px;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none;
+  }
+  #app{
+    max-width:960px;
+    margin:0 auto;
+    min-height:100vh;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .screen{ display:none; flex-direction:column; min-height:100vh; animation:fadein .18s ease; }
+  .screen.active{ display:flex; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
 
-/* ── SCREENS ─────────────────────────────────────────── */
-.screen{display:none;flex-direction:column;height:100%;overflow:hidden;}
-.screen.active{display:flex;}
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; gap:10px;
+    padding: calc(env(safe-area-inset-top,0px) + 14px) 16px 14px;
+    background:linear-gradient(180deg, var(--bg) 70%, rgba(8,12,20,0));
+    backdrop-filter: blur(6px);
+  }
+  .topbar h1{
+    font-family:var(--font-display);
+    font-size:20px; font-weight:800; margin:0; flex:1;
+    letter-spacing:.2px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .brand{ display:flex; align-items:center; gap:8px; }
+  .icon-btn{
+    width:40px; height:40px; border-radius:12px; border:1px solid var(--border);
+    background:var(--bg-elev); color:var(--text); font-size:18px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    flex-shrink:0;
+  }
+  .icon-btn:active{ background:var(--card-hover); }
+  .text-btn{
+    border:none; background:var(--accent); color:var(--accent-ink);
+    font-family:var(--font-body); font-weight:600; font-size:14px;
+    padding:9px 16px; border-radius:12px; cursor:pointer; flex-shrink:0;
+  }
+  .text-btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .text-btn.ghost{ background:transparent; color:var(--text-dim); border:1px solid var(--border); }
+  .text-btn.danger{ background:var(--danger); color:#fff; }
 
-/* ── TOPBAR ──────────────────────────────────────────── */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 20px 10px;
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-  padding-top:calc(14px + env(safe-area-inset-top,0px));
-}
-.topbar-title{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#fff;display:flex;align-items:center;gap:8px;}
-.topbar-logo{font-size:20px;}
-.topbar-sub{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
-.btn-icon{background:var(--surface2);border:1px solid var(--border);border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:background .15s;}
-.btn-icon:hover{background:var(--surface3);}
+  /* ---------- Library ---------- */
+  .search-row{ padding: 0 16px 10px; }
+  .search-row input{
+    width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+    background:var(--bg-elev); color:var(--text); font-family:var(--font-body); font-size:14px;
+  }
+  .search-row input:focus{ outline:none; border-color:var(--accent); }
+  .tag-filters{ display:flex; gap:8px; overflow-x:auto; padding:0 16px 14px; scrollbar-width:none; }
+  .tag-filters::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex-shrink:0; padding:7px 14px; border-radius:999px; border:1px solid var(--border);
+    background:var(--bg-elev); color:var(--text-dim); font-size:13px; cursor:pointer; white-space:nowrap;
+  }
+  .chip.active{ background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
 
-/* ── SCROLL BODY ─────────────────────────────────────── */
-.scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.scroll-body::-webkit-scrollbar{display:none;}
+  .status-banner{
+    margin:0 16px 14px; padding:11px 14px; border-radius:12px; font-size:13px;
+    border:1px solid var(--border); background:var(--bg-elev); display:flex; align-items:center; gap:8px;
+  }
+  .status-banner.warn{ border-color:#7c5210; background:rgba(245,158,11,.08); color:#f5b942; }
+  .status-banner.ok{ border-color:#1e5b34; background:rgba(34,197,94,.08); color:#4ade80; }
+  .status-banner.err{ border-color:#6b2323; background:rgba(239,68,68,.08); color:#f87171; }
+  .status-banner a, .status-banner button.link{
+    color:inherit; text-decoration:underline; background:none; border:none; padding:0; font:inherit; cursor:pointer;
+  }
 
-/* ── SEARCH & TAGS ───────────────────────────────────── */
-.search-wrap{padding:12px 16px 8px;}
-.search-box{
-  display:flex;align-items:center;gap:10px;
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:12px;padding:10px 14px;
-}
-.search-box input{
-  background:none;border:none;outline:none;flex:1;
-  color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;
-}
-.search-box input::placeholder{color:var(--muted);}
-.search-icon{color:var(--muted);font-size:16px;flex-shrink:0;}
+  .card-grid{
+    flex:1;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:12px;
+    padding:0 16px 100px;
+    align-content:start;
+  }
+  @media (min-width:720px){ .card-grid{ grid-template-columns:repeat(3,1fr); } }
 
-.tags-wrap{display:flex;gap:8px;padding:6px 16px 10px;overflow-x:auto;flex-shrink:0;}
-.tags-wrap::-webkit-scrollbar{display:none;}
-.tag-chip{
-  white-space:nowrap;padding:6px 14px;border-radius:999px;
-  background:var(--surface2);border:1px solid var(--border);
-  font-size:13px;color:var(--muted2);cursor:pointer;transition:all .15s;
-  font-family:'JetBrains Mono',monospace;
-}
-.tag-chip.on{background:var(--accent-dim);border-color:rgba(245,158,11,.35);color:var(--accent);}
+  .card{
+    background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius);
+    padding:14px; cursor:pointer; display:flex; flex-direction:column; gap:8px; min-height:128px;
+    position:relative; transition:transform .12s ease, background .12s ease;
+  }
+  .card:active{ transform:scale(.97); background:var(--card-hover); }
+  .card-icon{ font-size:22px; }
+  .card-title{
+    font-family:var(--font-display); font-weight:700; font-size:14.5px; line-height:1.3;
+    color:var(--text); word-break:break-word;
+  }
+  .card-desc{ font-size:12px; color:var(--text-dim); line-height:1.4; flex:1;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .card-tag{
+    align-self:flex-start; font-size:10.5px; font-family:var(--font-mono); color:var(--accent);
+    background:var(--accent-dim); padding:3px 8px; border-radius:6px;
+  }
 
-/* ── LIBRARY GRID ────────────────────────────────────── */
-.lib-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 16px 100px;}
-.doc-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:16px;cursor:pointer;
-  transition:transform .15s,border-color .15s,box-shadow .15s;
-  display:flex;flex-direction:column;gap:8px;min-height:120px;
-  position:relative;overflow:hidden;
-}
-.doc-card::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,var(--card-color,#f59e0b) 0%,transparent 60%);
-  opacity:.04;transition:opacity .15s;
-}
-.doc-card:active{transform:scale(.97);box-shadow:0 10px 40px rgba(0,0,0,.3);}
-.doc-card:active::before{opacity:.09;}
-.card-tag-badge{
-  display:inline-flex;align-items:center;
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:6px;padding:2px 8px;
-  font-size:10px;font-family:'JetBrains Mono',monospace;
-  color:var(--muted);width:fit-content;
-}
-.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:#fff;line-height:1.3;}
-.card-desc{font-size:12px;color:var(--muted);line-height:1.5;flex:1;}
-.card-date{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:4px;}
+  .empty-state{ text-align:center; padding:60px 24px; color:var(--text-faint); }
+  .empty-state .big{ font-size:44px; margin-bottom:12px; }
+  .empty-state h3{ font-family:var(--font-display); color:var(--text-dim); margin:0 0 6px; }
+  .empty-state p{ margin:0; font-size:13px; }
 
-/* Empty state */
-.empty{text-align:center;padding:60px 20px;color:var(--muted);}
-.empty-icon{font-size:48px;margin-bottom:16px;}
-.empty h3{font-family:'Syne',sans-serif;font-size:18px;color:var(--muted2);margin-bottom:8px;}
-.empty p{font-size:14px;line-height:1.6;}
+  .fab{
+    position:fixed; right:20px; bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
+    width:58px; height:58px; border-radius:50%; border:none; z-index:40;
+    background:var(--accent); color:var(--accent-ink); font-size:28px; line-height:1;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    box-shadow:0 8px 24px rgba(245,158,11,.35);
+  }
+  .fab:active{ transform:scale(.94); }
 
-/* ── FAB ─────────────────────────────────────────────── */
-.fab{
-  position:fixed;right:20px;
-  bottom:calc(24px + var(--safe-bottom));
-  width:56px;height:56px;border-radius:999px;
-  background:var(--accent);border:none;
-  font-size:26px;color:#000;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 8px 32px rgba(245,158,11,.4);
-  transition:transform .15s,box-shadow .15s;
-  z-index:10;
-}
-.fab:active{transform:scale(.93);box-shadow:0 4px 16px rgba(245,158,11,.3);}
+  /* ---------- Add / Settings form ---------- */
+  .form{ padding:4px 16px 40px; display:flex; flex-direction:column; gap:16px; flex:1; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:12.5px; color:var(--text-dim); font-weight:500; }
+  .field input, .field textarea{
+    width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+    background:var(--bg-elev); color:var(--text); font-family:var(--font-body); font-size:14px; resize:vertical;
+  }
+  .field input:focus, .field textarea:focus{ outline:none; border-color:var(--accent); }
+  .field textarea.desc-area{ min-height:64px; }
+  .code-area{
+    font-family:var(--font-mono) !important; font-size:12.5px !important; min-height:280px;
+    white-space:pre; overflow-wrap:normal; overflow-x:auto;
+  }
+  .hint{ font-size:12px; color:var(--text-faint); margin:0 0 8px; line-height:1.5; }
 
-/* ── ADD SCREEN ──────────────────────────────────────── */
-.add-body{padding:16px;display:flex;flex-direction:column;gap:14px;padding-bottom:120px;}
-.label{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
-.field-wrap{display:flex;flex-direction:column;}
-.field{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:12px;padding:12px 14px;
-  color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;
-  outline:none;width:100%;transition:border-color .15s;
-}
-.field:focus{border-color:var(--accent);}
-.field::placeholder{color:var(--muted);}
-textarea.field{resize:none;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;}
+  /* ---------- Viewer ---------- */
+  #screen-viewer{ padding:0; }
+  .viewer-actions{ display:flex; gap:8px; }
+  #viewer-frame{
+    flex:1; width:100%; border:none; background:#fff;
+  }
+  .viewer-meta{ padding:0 16px 10px; display:flex; gap:8px; flex-wrap:wrap; }
 
-/* Paste zone */
-.paste-zone-wrap{position:relative;}
-.paste-zone{min-height:160px;}
-.paste-placeholder{
-  position:absolute;top:12px;left:14px;right:14px;
-  pointer-events:none;transition:opacity .15s;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;min-height:136px;
-}
-.paste-placeholder-icon{font-size:28px;}
-.paste-placeholder-text{font-size:13px;color:var(--muted);text-align:center;line-height:1.5;}
-.paste-zone-wrap.filled .paste-placeholder{opacity:0;}
-.code-meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
-.char-count{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
-.btn-clear-code{background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline;padding:0;}
-
-/* AI Badge */
-.ai-badge{
-  display:none;align-items:center;gap:8px;
-  background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);
-  border-radius:10px;padding:10px 14px;font-size:13px;color:#6ee7b7;
-}
-.ai-badge.show{display:flex;}
-.ai-badge-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* Buttons */
-.btn-row{display:flex;gap:10px;}
-.btn{
-  border:none;border-radius:12px;padding:13px 20px;
-  font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;
-  cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;justify-content:center;
-}
-.btn-primary{background:var(--accent);color:#000;flex:1;}
-.btn-primary:active{transform:scale(.97);}
-.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-.btn-secondary{background:var(--surface2);border:1px solid var(--border);color:var(--muted2);flex:1;}
-.btn-secondary:active{transform:scale(.97);}
-.btn-danger{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.2);color:var(--red);}
-
-/* ── VIEWER SCREEN ───────────────────────────────────── */
-#s-view .topbar{padding-bottom:10px;}
-#s-view-iframe{flex:1;border:none;background:#fff;}
-
-/* ── SETTINGS SCREEN ─────────────────────────────────── */
-.settings-body{padding:20px;display:flex;flex-direction:column;gap:20px;padding-bottom:60px;}
-.settings-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
-.settings-card h3{font-family:'Syne',sans-serif;font-size:16px;color:#fff;margin-bottom:6px;}
-.settings-card p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
-.key-display{
-  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
-  padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;
-  color:var(--green);margin-bottom:12px;word-break:break-all;
-}
-.divider-line{height:1px;background:var(--border);margin:4px 0;}
-
-/* ── BOTTOM SHEET ────────────────────────────────────── */
-.sheet-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);
-  display:flex;align-items:flex-end;justify-content:center;
-  z-index:100;opacity:0;pointer-events:none;transition:opacity .2s;
-}
-.sheet-overlay.open{opacity:1;pointer-events:all;}
-.sheet{
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:20px 20px 0 0;width:100%;max-width:480px;
-  padding:16px 16px calc(16px + var(--safe-bottom));
-  transform:translateY(100%);transition:transform .25s cubic-bezier(.32,.72,0,1);
-}
-.sheet-overlay.open .sheet{transform:translateY(0);}
-.sheet-handle{width:36px;height:4px;background:var(--surface3);border-radius:99px;margin:0 auto 16px;}
-.sheet-title{font-family:'Syne',sans-serif;font-size:15px;color:#fff;margin-bottom:4px;}
-.sheet-tag{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:16px;}
-.sheet-actions{display:flex;flex-direction:column;gap:8px;}
-.sheet-btn{
-  display:flex;align-items:center;gap:12px;padding:14px 16px;
-  background:var(--surface2);border:1px solid var(--border);border-radius:12px;
-  color:var(--text);font-size:15px;font-family:'Outfit',sans-serif;cursor:pointer;
-  transition:background .15s;
-}
-.sheet-btn:active{background:var(--surface3);}
-.sheet-btn-icon{font-size:20px;width:28px;text-align:center;}
-.sheet-btn.danger{color:var(--red);border-color:rgba(248,113,113,.2);}
-.sheet-btn.cancel{color:var(--muted);margin-top:4px;}
-
-/* ── TOAST ───────────────────────────────────────────── */
-.toast{
-  position:fixed;bottom:calc(80px + var(--safe-bottom));left:50%;
-  transform:translateX(-50%) translateY(20px);
-  background:var(--surface3);border:1px solid var(--border2);
-  border-radius:12px;padding:10px 20px;
-  font-size:14px;color:var(--text);white-space:nowrap;
-  opacity:0;transition:all .25s;z-index:200;pointer-events:none;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* ── LOADING SPINNER ─────────────────────────────────── */
-.spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── RESPONSIVE ──────────────────────────────────────── */
-@media(min-width:480px){
-  .lib-grid{grid-template-columns:repeat(3,1fr);}
-  .sheet{border-radius:20px;margin-bottom:20px;max-width:420px;}
-}
+  /* ---------- Settings ---------- */
+  .settings-body{ padding:4px 16px 60px; display:flex; flex-direction:column; gap:22px; }
+  .settings-body h2{ font-family:var(--font-display); font-size:15px; margin:0 0 2px; color:var(--text); }
+  .settings-section{ display:flex; flex-direction:column; gap:10px; }
+  details.setup-guide{
+    border:1px solid var(--border); border-radius:12px; padding:12px 14px; background:var(--bg-elev);
+  }
+  details.setup-guide summary{ cursor:pointer; font-size:13.5px; color:var(--accent); font-weight:500; }
+  details.setup-guide pre{
+    margin-top:10px; font-family:var(--font-mono); font-size:11.5px; color:var(--text-dim);
+    white-space:pre-wrap; word-break:break-word; line-height:1.5;
+  }
+  .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .app-version{ text-align:center; color:var(--text-faint); font-size:11px; margin-top:auto; padding:20px; }
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════════════
-     SCREEN: LIBRARY
-════════════════════════════════════════════════════ -->
-<div id="s-lib" class="screen active">
-  <div class="topbar">
-    <div class="topbar-title">
-      <span class="topbar-logo">🗄️</span>
-      <div>
-        <div>HTML Vault</div>
-        <div class="topbar-sub" id="lib-count-label">0 items</div>
+<div id="app">
+
+  <!-- ===== Library Screen ===== -->
+  <section id="screen-library" class="screen active">
+    <header class="topbar">
+      <div class="brand"><h1>🗄️ HTML Vault</h1></div>
+      <button class="icon-btn" id="btn-add-topbar" aria-label="เพิ่มหน้าใหม่">+</button>
+      <button class="icon-btn" id="btn-open-settings" aria-label="ตั้งค่า">⚙️</button>
+    </header>
+
+    <div id="fb-status-library" class="status-banner" hidden></div>
+    <div id="legacy-import-banner" class="status-banner warn" hidden style="justify-content:space-between">
+      <span id="legacy-import-text"></span>
+      <button class="text-btn" id="btn-legacy-import" style="flex-shrink:0">นำเข้าเลย</button>
+    </div>
+
+    <div class="search-row">
+      <input id="search-input" type="search" placeholder="ค้นหาชื่อ, tag, คำอธิบาย...">
+    </div>
+    <div id="tag-filters" class="tag-filters"></div>
+
+    <div id="empty-state" class="empty-state" hidden>
+      <div class="big">📭</div>
+      <h3>ยังไม่มีหน้าที่บันทึกไว้</h3>
+      <p>กดปุ่ม + ด้านล่างขวาเพื่อเพิ่ม HTML แรกของคุณ</p>
+    </div>
+
+    <div id="card-grid" class="card-grid"></div>
+
+    <button class="fab" id="fab-add" aria-label="เพิ่มหน้าใหม่">+</button>
+  </section>
+
+  <!-- ===== Add / Edit Screen ===== -->
+  <section id="screen-add" class="screen">
+    <header class="topbar">
+      <button class="icon-btn" data-back="library" aria-label="ย้อนกลับ">←</button>
+      <h1 id="add-screen-title">เพิ่ม HTML ใหม่</h1>
+      <button class="text-btn" id="btn-save">บันทึก</button>
+    </header>
+    <div class="form">
+      <div class="field">
+        <label for="input-title">ชื่อ (Title) *</label>
+        <input id="input-title" type="text" placeholder="เช่น Landing Page Draft">
+      </div>
+      <div class="field">
+        <label for="input-tag">Tag</label>
+        <input id="input-tag" type="text" placeholder="เช่น landing, game, tool">
+      </div>
+      <div class="field">
+        <label for="input-desc">คำอธิบาย</label>
+        <textarea id="input-desc" class="desc-area" placeholder="อธิบายสั้นๆ ว่าหน้านี้คืออะไร"></textarea>
+      </div>
+      <div class="field">
+        <label for="input-code">HTML Code *</label>
+        <textarea id="input-code" class="code-area" spellcheck="false" placeholder="วางโค้ด HTML ทั้งหน้าที่นี่..."></textarea>
       </div>
     </div>
-    <button class="btn-icon" onclick="goTo('s-settings')" title="Settings">⚙️</button>
-  </div>
+  </section>
 
-  <div class="search-wrap">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input id="search-input" type="search" placeholder="ค้นหาชื่อหรือ tag..." oninput="renderLib()">
-    </div>
-  </div>
-
-  <div class="tags-wrap" id="tags-bar">
-    <span class="tag-chip on" onclick="setTag('')" data-tag="">ทั้งหมด</span>
-  </div>
-
-  <div class="scroll-body">
-    <div class="lib-grid" id="lib-grid"></div>
-  </div>
-
-  <button class="fab" onclick="goTo('s-add')">＋</button>
-</div>
-
-
-<!-- ════════════════════════════════════════════════════
-     SCREEN: ADD
-════════════════════════════════════════════════════ -->
-<div id="s-add" class="screen">
-  <div class="topbar">
-    <button class="btn-icon" onclick="goTo('s-lib');clearCode()">←</button>
-    <div class="topbar-title">เพิ่มเอกสาร</div>
-    <div style="width:40px"></div>
-  </div>
-
-  <div class="scroll-body">
-    <div class="add-body">
-
-      <!-- Paste Zone -->
-      <div class="field-wrap">
-        <div class="label">HTML Code</div>
-        <div class="paste-zone-wrap" id="paste-zone-wrap">
-          <textarea class="field paste-zone" id="code-input" rows="8"
-            oninput="onCodeChange()" placeholder=""
-            spellcheck="false"></textarea>
-          <div class="paste-placeholder" id="paste-ph">
-            <div class="paste-placeholder-icon">📋</div>
-            <div class="paste-placeholder-text">วาง HTML ที่ได้จาก Claude<br>แล้วกรอกชื่อด้านล่าง</div>
-          </div>
-        </div>
-        <div class="code-meta">
-          <span class="char-count" id="char-count">0 chars</span>
-          <button class="btn-clear-code" onclick="clearCode()">ล้าง</button>
-        </div>
+  <!-- ===== Viewer Screen ===== -->
+  <section id="screen-viewer" class="screen">
+    <header class="topbar">
+      <button class="icon-btn" data-back="library" aria-label="ย้อนกลับ">←</button>
+      <h1 id="viewer-title">-</h1>
+      <div class="viewer-actions">
+        <button class="icon-btn" id="btn-edit" aria-label="แก้ไข">✏️</button>
+        <button class="icon-btn" id="btn-delete" aria-label="ลบ">🗑️</button>
       </div>
+    </header>
+    <iframe id="viewer-frame" sandbox="allow-scripts allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"></iframe>
+  </section>
 
-      <!-- Title -->
-      <div class="field-wrap">
-        <div class="label">ชื่อเอกสาร *</div>
-        <input class="field" id="title-input" type="text" placeholder="เช่น GitHub Cheatsheet">
-      </div>
-
-      <!-- Tag -->
-      <div class="field-wrap">
-        <div class="label">Tag / หมวดหมู่</div>
-        <input class="field" id="tag-input" type="text" placeholder="เช่น learn, finance, tool">
-      </div>
-
-      <!-- Description -->
-      <div class="field-wrap">
-        <div class="label">คำอธิบาย</div>
-        <input class="field" id="desc-input" type="text" placeholder="อธิบายสั้นๆ ว่าเอกสารนี้คืออะไร">
-      </div>
-
-      <!-- Save -->
-      <div class="btn-row">
-        <button class="btn btn-secondary" onclick="goTo('s-lib');clearCode()">ยกเลิก</button>
-        <button class="btn btn-primary" id="btn-save" onclick="saveDoc()">💾 บันทึก</button>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-
-<!-- ════════════════════════════════════════════════════
-     SCREEN: VIEWER
-════════════════════════════════════════════════════ -->
-<div id="s-view" class="screen">
-  <div class="topbar">
-    <button class="btn-icon" onclick="goTo('s-lib')">←</button>
-    <div class="topbar-title" id="view-title" style="font-size:16px">เอกสาร</div>
-    <button class="btn-icon" id="btn-copy-view" onclick="copyCurrentDoc()">📋</button>
-  </div>
-  <iframe id="s-view-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
-</div>
-
-
-<!-- ════════════════════════════════════════════════════
-     SCREEN: SETTINGS
-════════════════════════════════════════════════════ -->
-<div id="s-settings" class="screen">
-  <div class="topbar">
-    <button class="btn-icon" onclick="goTo('s-lib')">←</button>
-    <div class="topbar-title">Settings</div>
-    <div style="width:40px"></div>
-  </div>
-
-  <div class="scroll-body">
+  <!-- ===== Settings Screen ===== -->
+  <section id="screen-settings" class="screen">
+    <header class="topbar">
+      <button class="icon-btn" data-back="library" aria-label="ย้อนกลับ">←</button>
+      <h1>ตั้งค่า</h1>
+    </header>
     <div class="settings-body">
 
-      <div class="settings-card">
-        <h3>📦 ข้อมูลทั้งหมด</h3>
-        <p>ข้อมูลทั้งหมดเก็บใน browser นี้เท่านั้น ไม่ sync ข้ามเครื่อง ถ้าล้าง browser data ข้อมูลจะหายไป</p>
-        <div class="divider-line" style="margin-bottom:12px"></div>
-        <p id="storage-info" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)"></p>
-      </div>
+      <div id="fb-status-settings" class="status-banner"></div>
 
-      <div class="settings-card">
-        <h3>ℹ️ วิธีใช้</h3>
-        <p style="margin:0">
-          1. ได้ HTML จาก Claude<br>
-          2. กด + แล้ววาง HTML ลงไป<br>
-          3. กรอกชื่อ / tag / คำอธิบาย<br>
-          4. กด บันทึก → ปรากฏในห้องสมุด<br>
-          5. กดที่ card เพื่อ Preview / Copy / Delete
+      <div class="settings-section">
+        <h2>Firebase Config</h2>
+        <p class="hint">
+          ไปที่ Firebase Console → Project settings → General → Your apps → SDK setup and configuration
+          แล้วคัดลอกก้อน config (จะเป็น <code>const firebaseConfig = {...}</code> หรือ JSON ก็ได้) มาวางที่นี่ทั้งก้อน
+          ระบบจะดึงเฉพาะส่วน object ออกมาให้เอง
         </p>
+        <div class="field">
+          <textarea id="input-fbconfig" class="code-area" style="min-height:160px" spellcheck="false" placeholder='{
+  "apiKey": "...",
+  "authDomain": "...",
+  "projectId": "...",
+  "storageBucket": "...",
+  "messagingSenderId": "...",
+  "appId": "..."
+}'></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="text-btn" id="btn-save-fbconfig">บันทึกและเชื่อมต่อใหม่</button>
+          <button class="text-btn ghost" id="btn-clear-fbconfig">ล้างค่า Firebase</button>
+        </div>
       </div>
 
+      <div class="settings-section">
+        <details class="setup-guide">
+          <summary>⚠️ ต้องตั้ง Firestore Security Rules ก่อนใช้งานจริง</summary>
+          <pre>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</pre>
+          <p class="hint" style="margin-top:10px">
+            วาง rules นี้ที่ Firebase Console → Firestore Database → Rules แล้วกด Publish
+            (rules นี้เปิดให้ทุกคนอ่าน/เขียนได้ — เหมาะกับการใช้งานส่วนตัว/ทดสอบเท่านั้น
+            ถ้าต้องการความปลอดภัยเพิ่ม ควรเพิ่ม Firebase Authentication ภายหลัง)
+          </p>
+        </details>
+      </div>
+
+      <div class="settings-section">
+        <h2>ข้อมูล</h2>
+        <p class="hint">จำนวนหน้าที่บันทึกไว้: <span id="settings-page-count">0</span> หน้า</p>
+      </div>
+
+      <div class="app-version">HTML Vault · PWA + Firestore edition</div>
     </div>
-  </div>
+  </section>
+
 </div>
 
-
-<!-- ════════════════════════════════════════════════════
-     BOTTOM SHEET
-════════════════════════════════════════════════════ -->
-<div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet(event)">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title" id="sheet-title">ชื่อเอกสาร</div>
-    <div class="sheet-tag" id="sheet-tag">#tag</div>
-    <div class="sheet-actions">
-      <button class="sheet-btn" onclick="sheetAction('view')">
-        <span class="sheet-btn-icon">👁️</span><span>เปิดดู Preview</span>
-      </button>
-      <button class="sheet-btn" onclick="sheetAction('copy')">
-        <span class="sheet-btn-icon">📋</span><span>Copy HTML Code</span>
-      </button>
-      <button class="sheet-btn danger" onclick="sheetAction('delete')">
-        <span class="sheet-btn-icon">🗑️</span><span>ลบเอกสารนี้</span>
-      </button>
-      <button class="sheet-btn cancel" onclick="closeSheet()">
-        <span class="sheet-btn-icon">✕</span><span>ยกเลิก</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-/* ── DATA ──────────────────────────────────────────────── */
-let docs = [];
-let activeTag = '';
-let currentSheetId = null;
-let currentViewId = null;
+(function(){
+  'use strict';
 
-const STORAGE_KEY = 'htmlvault_v2';
-const APIKEY_KEY  = 'htmlvault_apikey';
+  /*
+    Firestore data model:
+    collection "pages" — each document:
+      { id: string, title: string, tag: string, desc: string, code: string, createdAt: Timestamp }
 
-function load() {
-  try { docs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  catch(e) { docs = []; }
-}
-function persist() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(docs));
-}
+    Required Firestore Security Rules (set in Firebase Console → Firestore Database → Rules):
 
-/* ── NAVIGATION ────────────────────────────────────────── */
-function goTo(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if (id === 's-lib')      { renderLib(); }
-  if (id === 's-settings') { renderSettings(); }
-}
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /{document=**} {
+          allow read, write: if true;
+        }
+      }
+    }
+  */
 
-/* ── LIBRARY ───────────────────────────────────────────── */
-function renderLib() {
-  const q    = (document.getElementById('search-input').value || '').toLowerCase();
-  const grid = document.getElementById('lib-grid');
-  const label = document.getElementById('lib-count-label');
+  var PLACEHOLDER_CONFIG = {
+    apiKey: "PASTE_YOUR_API_KEY",
+    authDomain: "PASTE_YOUR_AUTH_DOMAIN",
+    projectId: "PASTE_YOUR_PROJECT_ID",
+    storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+    messagingSenderId: "PASTE_YOUR_SENDER_ID",
+    appId: "PASTE_YOUR_APP_ID"
+  };
 
-  let filtered = docs.filter(d => {
-    const matchTag  = !activeTag || d.tag === activeTag;
-    const matchQ    = !q || d.title.toLowerCase().includes(q) || (d.tag||'').includes(q) || (d.desc||'').toLowerCase().includes(q);
-    return matchTag && matchQ;
-  }).sort((a,b) => b.createdAt - a.createdAt);
+  var LS_CONFIG_KEY = 'vault_firebase_config';
 
-  label.textContent = `${docs.length} item${docs.length !== 1 ? 's' : ''}`;
+  var db = null;
+  var unsubscribe = null;
+  var pagesCache = [];
+  var activeTag = null;
+  var searchQuery = '';
+  var editingId = null;
+  var currentViewerId = null;
 
-  // Rebuild tags
-  const allTags = [...new Set(docs.map(d => d.tag).filter(Boolean))].sort();
-  const tagsBar = document.getElementById('tags-bar');
-  tagsBar.innerHTML = `<span class="tag-chip ${!activeTag?'on':''}" onclick="setTag('')" data-tag="">ทั้งหมด</span>`;
-  allTags.forEach(t => {
-    const chip = document.createElement('span');
-    chip.className = 'tag-chip' + (activeTag === t ? ' on' : '');
-    chip.textContent = t;
-    chip.onclick = () => setTag(t);
-    tagsBar.appendChild(chip);
+  // ---------- DOM refs ----------
+  var screens = document.querySelectorAll('.screen');
+  var cardGrid = document.getElementById('card-grid');
+  var emptyState = document.getElementById('empty-state');
+  var tagFiltersEl = document.getElementById('tag-filters');
+  var searchInput = document.getElementById('search-input');
+
+  var titleInput = document.getElementById('input-title');
+  var tagInput = document.getElementById('input-tag');
+  var descInput = document.getElementById('input-desc');
+  var codeInput = document.getElementById('input-code');
+  var addScreenTitle = document.getElementById('add-screen-title');
+  var btnSave = document.getElementById('btn-save');
+
+  var viewerFrame = document.getElementById('viewer-frame');
+  var viewerTitle = document.getElementById('viewer-title');
+  var btnEdit = document.getElementById('btn-edit');
+  var btnDelete = document.getElementById('btn-delete');
+
+  var fbConfigInput = document.getElementById('input-fbconfig');
+  var btnSaveFbConfig = document.getElementById('btn-save-fbconfig');
+  var btnClearFbConfig = document.getElementById('btn-clear-fbconfig');
+  var settingsPageCount = document.getElementById('settings-page-count');
+  var statusLibrary = document.getElementById('fb-status-library');
+  var statusSettings = document.getElementById('fb-status-settings');
+
+  // ---------- Screen navigation ----------
+  function showScreen(name){
+    screens.forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById('screen-' + name).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  document.querySelectorAll('[data-back]').forEach(function(btn){
+    btn.addEventListener('click', function(){ showScreen(btn.dataset.back); });
   });
 
-  if (filtered.length === 0) {
-    grid.innerHTML = `
-      <div class="empty" style="grid-column:1/-1">
-        <div class="empty-icon">${docs.length === 0 ? '📚' : '🔍'}</div>
-        <h3>${docs.length === 0 ? 'ห้องสมุดว่างอยู่' : 'ไม่พบเอกสาร'}</h3>
-        <p>${docs.length === 0 ? 'กด + เพื่อเพิ่มเอกสารแรก' : 'ลองค้นหาด้วยคำอื่น'}</p>
-      </div>`;
-    return;
+  document.getElementById('btn-open-settings').addEventListener('click', function(){
+    fbConfigInput.value = '';
+    showScreen('settings');
+  });
+
+  document.getElementById('fab-add').addEventListener('click', function(){
+    openAddForm(null);
+  });
+  document.getElementById('btn-add-topbar').addEventListener('click', function(){
+    openAddForm(null);
+  });
+
+  // ---------- Firebase config helpers ----------
+  function getStoredConfig(){
+    try{
+      var raw = localStorage.getItem(LS_CONFIG_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){ console.warn('Stored firebase config is invalid JSON', e); }
+    return null;
   }
 
-  const colors = ['#a78bfa','#fb923c','#34d399','#60a5fa','#f472b6','#facc15','#f87171'];
-  grid.innerHTML = filtered.map((d,i) => {
-    const color = colors[i % colors.length];
-    const date  = new Date(d.createdAt).toLocaleDateString('th-TH',{day:'numeric',month:'short'});
-    return `
-      <div class="doc-card" style="--card-color:${color}" onclick="openSheet('${d.id}')">
-        <div class="card-tag-badge">${d.tag || 'ไม่มี tag'}</div>
-        <div class="card-title">${esc(d.title)}</div>
-        <div class="card-desc">${esc(d.desc || '—')}</div>
-        <div class="card-date">${date}</div>
-      </div>`;
-  }).join('');
-}
-
-function setTag(t) {
-  activeTag = t;
-  renderLib();
-}
-
-/* ── ADD FORM ──────────────────────────────────────────── */
-function onCodeChange() {
-  const val = document.getElementById('code-input').value;
-  const wrap = document.getElementById('paste-zone-wrap');
-  document.getElementById('char-count').textContent = val.length.toLocaleString() + ' chars';
-  wrap.classList.toggle('filled', val.length > 0);
-}
-
-function clearCode() {
-  document.getElementById('code-input').value = '';
-  document.getElementById('title-input').value = '';
-  document.getElementById('tag-input').value = '';
-  document.getElementById('desc-input').value = '';
-  document.getElementById('char-count').textContent = '0 chars';
-  document.getElementById('paste-zone-wrap').classList.remove('filled');
-}
-
-function saveDoc() {
-  const title = document.getElementById('title-input').value.trim();
-  const code  = document.getElementById('code-input').value.trim();
-  if (!title) { toast('⚠️ กรุณาใส่ชื่อเอกสาร'); return; }
-  if (!code)  { toast('⚠️ กรุณาวาง HTML code'); return; }
-
-  const doc = {
-    id:        Date.now().toString(36) + Math.random().toString(36).slice(2,6),
-    title,
-    tag:       (document.getElementById('tag-input').value || '').toLowerCase().trim(),
-    desc:      document.getElementById('desc-input').value.trim(),
-    code,
-    createdAt: Date.now()
-  };
-  docs.push(doc);
-  persist();
-  clearCode();
-  renderLib();
-  goTo('s-lib');
-  toast('✅ บันทึกเรียบร้อย');
-}
-
-/* ── BOTTOM SHEET ──────────────────────────────────────── */
-function openSheet(id) {
-  const doc = docs.find(d => d.id === id);
-  if (!doc) return;
-  currentSheetId = id;
-  document.getElementById('sheet-title').textContent = doc.title;
-  document.getElementById('sheet-tag').textContent   = '#' + (doc.tag || 'ไม่มี tag');
-  document.getElementById('sheet-overlay').classList.add('open');
-}
-
-function closeSheet(e) {
-  if (!e || e.target === document.getElementById('sheet-overlay') || !e.currentTarget) {
-    document.getElementById('sheet-overlay').classList.remove('open');
+  function isPlaceholder(cfg){
+    if(!cfg) return true;
+    return Object.keys(PLACEHOLDER_CONFIG).some(function(k){
+      var v = cfg[k];
+      return typeof v !== 'string' || v.indexOf('PASTE_YOUR') === 0 || v.length === 0;
+    });
   }
-}
 
-function sheetAction(action) {
-  document.getElementById('sheet-overlay').classList.remove('open');
-  if (!currentSheetId) return;
-  if (action === 'view')   openViewer(currentSheetId);
-  if (action === 'copy')   copyCode(currentSheetId);
-  if (action === 'delete') delDoc(currentSheetId);
-}
+  // Accepts strict JSON OR a pasted "const firebaseConfig = {...};" JS object literal.
+  function parseFirebaseConfigInput(raw){
+    raw = (raw || '').trim();
+    if(!raw) throw new Error('กรุณาวาง Firebase config ก่อน');
 
-/* ── VIEWER ────────────────────────────────────────────── */
-function openViewer(id) {
-  const doc = docs.find(d => d.id === id);
-  if (!doc) return;
-  currentViewId = id;
-  document.getElementById('view-title').textContent = doc.title;
-  document.getElementById('s-view-iframe').srcdoc = doc.code;
-  goTo('s-view');
-}
+    // Pasted text may be the whole SDK snippet (import statement, comments,
+    // initializeApp(...) call, etc.) — scan for every balanced {...} block
+    // and pick the one that actually contains "apiKey", instead of naively
+    // grabbing from the first "{" to the last "}" in the whole paste.
+    var candidates = [];
+    for(var i = 0; i < raw.length; i++){
+      if(raw[i] === '{'){
+        var depth = 1, j = i + 1;
+        while(j < raw.length && depth > 0){
+          if(raw[j] === '{') depth++;
+          else if(raw[j] === '}') depth--;
+          j++;
+        }
+        if(depth === 0){
+          candidates.push(raw.slice(i, j));
+          i = j - 1;
+        }
+      }
+    }
+    var literal = candidates.find(function(c){ return c.indexOf('apiKey') !== -1; });
+    if(!literal) throw new Error('ไม่พบ apiKey ในข้อความที่วาง — กรุณาวางก้อน firebaseConfig ทั้งหมด');
+    var obj;
+    try{
+      obj = JSON.parse(literal);
+    }catch(e){
+      try{
+        // Fallback: evaluate as a JS object literal (handles unquoted keys / single quotes,
+        // exactly what the Firebase console snippet looks like).
+        obj = (new Function('"use strict"; return (' + literal + ');'))();
+      }catch(e2){
+        throw new Error('รูปแบบ config ไม่ถูกต้อง: ' + e2.message);
+      }
+    }
+    if(!obj || typeof obj !== 'object') throw new Error('รูปแบบ config ไม่ถูกต้อง');
+    if(!obj.apiKey || !obj.projectId) throw new Error('config ต้องมีอย่างน้อย apiKey และ projectId');
+    return obj;
+  }
 
-function copyCurrentDoc() {
-  if (currentViewId) copyCode(currentViewId);
-}
+  function setStatus(connected, message){
+    [statusLibrary, statusSettings].forEach(function(el){
+      if(!el) return;
+      el.hidden = false;
+      el.textContent = message;
+      el.className = 'status-banner ' + (connected === true ? 'ok' : connected === false ? 'warn' : 'err');
+    });
+    if(connected === true) statusLibrary.hidden = true; // hide the happy banner on Library, keep it on Settings
+  }
 
-/* ── ACTIONS ───────────────────────────────────────────── */
-function copyCode(id) {
-  const doc = docs.find(d => d.id === id);
-  if (!doc) return;
-  navigator.clipboard.writeText(doc.code)
-    .then(() => toast('📋 Copy แล้ว!'))
-    .catch(() => toast('❌ ไม่สามารถ copy ได้'));
-}
+  function setErrorStatus(message){
+    [statusLibrary, statusSettings].forEach(function(el){
+      if(!el) return;
+      el.hidden = false;
+      el.textContent = message;
+      el.className = 'status-banner err';
+    });
+  }
 
-function delDoc(id) {
-  if (!confirm('ลบเอกสารนี้?')) return;
-  docs = docs.filter(d => d.id !== id);
-  persist();
-  renderLib();
-  toast('🗑️ ลบแล้ว');
-}
+  // ---------- Firebase lifecycle ----------
+  function initFirebase(){
+    var stored = getStoredConfig();
+    var config = stored || PLACEHOLDER_CONFIG;
 
-/* ── SETTINGS ──────────────────────────────────────────── */
-function renderSettings() {
-  const size = new Blob([localStorage.getItem(STORAGE_KEY)||'']).size;
-  document.getElementById('storage-info').textContent =
-    `${docs.length} เอกสาร · ${(size/1024).toFixed(1)} KB`;
-}
+    if(isPlaceholder(config)){
+      db = null;
+      pagesCache = [];
+      renderCards();
+      renderTagFilters();
+      setStatus(false, '🔧 ยังไม่ได้ตั้งค่า Firebase — แตะปุ่ม ⚙️ ด้านบนเพื่อวาง Firebase config');
+      return;
+    }
 
-/* ── TOAST ─────────────────────────────────────────────── */
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
-}
+    try{
+      var app = firebase.initializeApp(config);
+      db = app.firestore();
+      db.enablePersistence({ synchronizeTabs: true }).catch(function(err){
+        console.warn('Firestore offline persistence not enabled:', err.code);
+      });
+      setStatus(true, '✅ เชื่อมต่อ Firebase สำเร็จ (project: ' + config.projectId + ')');
+      subscribeToPages();
+      checkLegacyImport();
+    }catch(e){
+      console.error('Firebase init error', e);
+      db = null;
+      setErrorStatus('❌ เชื่อมต่อ Firebase ไม่สำเร็จ: ' + e.message);
+    }
+  }
 
-/* ── UTILS ─────────────────────────────────────────────── */
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+  function applyNewConfig(config){
+    localStorage.setItem(LS_CONFIG_KEY, JSON.stringify(config));
+    var steps = Promise.resolve();
+    if(unsubscribe){ unsubscribe(); unsubscribe = null; }
+    if(firebase.apps && firebase.apps.length){
+      steps = firebase.apps[0].delete().catch(function(){});
+    }
+    return steps.then(function(){
+      db = null;
+      initFirebase();
+    });
+  }
 
-/* ── INIT ──────────────────────────────────────────────── */
-load();
-renderLib();
+  function subscribeToPages(){
+    if(!db) return;
+    unsubscribe = db.collection('pages').orderBy('createdAt', 'desc')
+      .onSnapshot(function(snap){
+        pagesCache = snap.docs.map(function(d){
+          var data = d.data();
+          data.id = d.id;
+          return data;
+        });
+        renderTagFilters();
+        renderCards();
+        settingsPageCount.textContent = pagesCache.length;
+        if(document.getElementById('screen-viewer').classList.contains('active') && currentViewerId){
+          var updated = pagesCache.find(function(p){ return p.id === currentViewerId; });
+          if(!updated) showScreen('library'); // was deleted elsewhere
+        }
+      }, function(err){
+        console.error('Firestore onSnapshot error', err);
+        setErrorStatus('⚠️ อ่านข้อมูลไม่สำเร็จ (อาจไม่มีเน็ตหรือยังไม่ได้ตั้ง Firestore Rules): ' + err.message);
+      });
+  }
+
+  // ---------- Rendering: Library ----------
+  function renderTagFilters(){
+    var tags = Array.from(new Set(pagesCache.map(function(p){ return (p.tag || '').trim(); }).filter(Boolean)));
+    tagFiltersEl.innerHTML = '';
+    if(tags.length === 0){ tagFiltersEl.hidden = true; return; }
+    tagFiltersEl.hidden = false;
+
+    var allChip = document.createElement('button');
+    allChip.className = 'chip' + (activeTag === null ? ' active' : '');
+    allChip.textContent = 'ทั้งหมด';
+    allChip.addEventListener('click', function(){ activeTag = null; renderTagFilters(); renderCards(); });
+    tagFiltersEl.appendChild(allChip);
+
+    tags.forEach(function(tag){
+      var chip = document.createElement('button');
+      chip.className = 'chip' + (activeTag === tag ? ' active' : '');
+      chip.textContent = tag;
+      chip.addEventListener('click', function(){ activeTag = (activeTag === tag ? null : tag); renderTagFilters(); renderCards(); });
+      tagFiltersEl.appendChild(chip);
+    });
+  }
+
+  function renderCards(){
+    var q = searchQuery.trim().toLowerCase();
+    var filtered = pagesCache.filter(function(p){
+      if(activeTag && (p.tag || '') !== activeTag) return false;
+      if(!q) return true;
+      var hay = ((p.title||'') + ' ' + (p.tag||'') + ' ' + (p.desc||'')).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+
+    cardGrid.innerHTML = '';
+    emptyState.hidden = filtered.length > 0;
+    if(filtered.length === 0){
+      emptyState.querySelector('h3').textContent = pagesCache.length === 0 ? 'ยังไม่มีหน้าที่บันทึกไว้' : 'ไม่พบผลลัพธ์';
+      emptyState.querySelector('p').textContent = pagesCache.length === 0 ? 'กดปุ่ม + ด้านล่างขวาเพื่อเพิ่ม HTML แรกของคุณ' : 'ลองค้นหาด้วยคำอื่น หรือเลือก tag อื่น';
+      return;
+    }
+
+    filtered.forEach(function(p){
+      var card = document.createElement('div');
+      card.className = 'card';
+
+      var icon = document.createElement('div');
+      icon.className = 'card-icon';
+      icon.textContent = '📄';
+      card.appendChild(icon);
+
+      var title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = p.title || '(ไม่มีชื่อ)';
+      card.appendChild(title);
+
+      if(p.desc){
+        var desc = document.createElement('div');
+        desc.className = 'card-desc';
+        desc.textContent = p.desc;
+        card.appendChild(desc);
+      }
+
+      if(p.tag){
+        var tag = document.createElement('div');
+        tag.className = 'card-tag';
+        tag.textContent = p.tag;
+        card.appendChild(tag);
+      }
+
+      card.addEventListener('click', function(){ openViewer(p.id); });
+      cardGrid.appendChild(card);
+    });
+  }
+
+  searchInput.addEventListener('input', function(){
+    searchQuery = searchInput.value;
+    renderCards();
+  });
+
+  // ---------- Add / Edit ----------
+  function openAddForm(pageId){
+    editingId = pageId;
+    if(pageId){
+      var p = pagesCache.find(function(x){ return x.id === pageId; });
+      if(!p) return;
+      addScreenTitle.textContent = 'แก้ไข HTML';
+      titleInput.value = p.title || '';
+      tagInput.value = p.tag || '';
+      descInput.value = p.desc || '';
+      codeInput.value = p.code || '';
+    } else {
+      addScreenTitle.textContent = 'เพิ่ม HTML ใหม่';
+      titleInput.value = '';
+      tagInput.value = '';
+      descInput.value = '';
+      codeInput.value = '';
+    }
+    showScreen('add');
+  }
+
+  btnSave.addEventListener('click', function(){
+    var title = titleInput.value.trim();
+    var tag = tagInput.value.trim();
+    var desc = descInput.value.trim();
+    var code = codeInput.value;
+
+    if(!title){ alert('กรุณากรอกชื่อ (Title)'); titleInput.focus(); return; }
+    if(!code){ alert('กรุณาวาง HTML Code'); codeInput.focus(); return; }
+    if(!db){ alert('ยังไม่ได้เชื่อมต่อ Firebase — ไปที่ Settings (⚙️) เพื่อวาง Firebase config ก่อน'); return; }
+
+    btnSave.disabled = true;
+    btnSave.textContent = 'กำลังบันทึก...';
+
+    var task;
+    if(editingId){
+      task = db.collection('pages').doc(editingId).update({ title: title, tag: tag, desc: desc, code: code });
+    } else {
+      var docRef = db.collection('pages').doc();
+      task = docRef.set({
+        id: docRef.id,
+        title: title,
+        tag: tag,
+        desc: desc,
+        code: code,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    task.then(function(){
+      editingId = null;
+      showScreen('library');
+    }).catch(function(e){
+      console.error('Save failed', e);
+      alert('บันทึกไม่สำเร็จ: ' + e.message);
+    }).finally(function(){
+      btnSave.disabled = false;
+      btnSave.textContent = 'บันทึก';
+    });
+  });
+
+  // ---------- Viewer ----------
+  function openViewer(pageId){
+    var p = pagesCache.find(function(x){ return x.id === pageId; });
+    if(!p) return;
+    currentViewerId = pageId;
+    viewerTitle.textContent = p.title || '(ไม่มีชื่อ)';
+    viewerFrame.srcdoc = p.code || '';
+    showScreen('viewer');
+  }
+
+  btnEdit.addEventListener('click', function(){
+    if(!currentViewerId) return;
+    openAddForm(currentViewerId);
+  });
+
+  btnDelete.addEventListener('click', function(){
+    if(!currentViewerId || !db) return;
+    if(!confirm('ลบหน้านี้ถาวร? การลบนี้ย้อนกลับไม่ได้')) return;
+    db.collection('pages').doc(currentViewerId).delete().then(function(){
+      currentViewerId = null;
+      showScreen('library');
+    }).catch(function(e){
+      console.error('Delete failed', e);
+      alert('ลบไม่สำเร็จ: ' + e.message);
+    });
+  });
+
+  // ---------- Settings ----------
+  btnSaveFbConfig.addEventListener('click', function(){
+    var config;
+    try{
+      config = parseFirebaseConfigInput(fbConfigInput.value);
+    }catch(e){
+      alert(e.message);
+      return;
+    }
+    btnSaveFbConfig.disabled = true;
+    btnSaveFbConfig.textContent = 'กำลังเชื่อมต่อ...';
+    applyNewConfig(config).then(function(){
+      fbConfigInput.value = '';
+    }).finally(function(){
+      btnSaveFbConfig.disabled = false;
+      btnSaveFbConfig.textContent = 'บันทึกและเชื่อมต่อใหม่';
+    });
+  });
+
+  btnClearFbConfig.addEventListener('click', function(){
+    if(!confirm('ล้างค่า Firebase config ที่บันทึกไว้ในเครื่องนี้?')) return;
+    localStorage.removeItem(LS_CONFIG_KEY);
+    if(unsubscribe){ unsubscribe(); unsubscribe = null; }
+    if(firebase.apps && firebase.apps.length){
+      firebase.apps[0].delete().catch(function(){}).then(initFirebase);
+    } else {
+      initFirebase();
+    }
+  });
+
+  // ---------- Service worker ----------
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js').catch(function(e){
+        console.error('Service worker registration failed', e);
+      });
+    });
+  }
+
+  // ---------- Boot ----------
+  initFirebase();
+
+})();
 </script>
 </body>
 </html>

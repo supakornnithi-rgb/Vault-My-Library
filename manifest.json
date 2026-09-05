@@ -1,0 +1,33 @@
+{
+  "name": "HTML Vault",
+  "short_name": "Vault",
+  "description": "ห้องสมุด HTML page ส่วนตัว บันทึกและเปิดดูโค้ด HTML ที่บันทึกไว้ ใช้งานได้แม้ออฟไลน์",
+  "start_url": "./html-vault.html",
+  "scope": "./",
+  "id": "./html-vault.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#080c14",
+  "theme_color": "#080c14",
+  "lang": "th",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
