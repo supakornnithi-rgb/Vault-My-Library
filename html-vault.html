@@ -210,10 +210,6 @@
     </header>
 
     <div id="fb-status-library" class="status-banner" hidden></div>
-    <div id="legacy-import-banner" class="status-banner warn" hidden style="justify-content:space-between">
-      <span id="legacy-import-text"></span>
-      <button class="text-btn" id="btn-legacy-import" style="flex-shrink:0">นำเข้าเลย</button>
-    </div>
 
     <div class="search-row">
       <input id="search-input" type="search" placeholder="ค้นหาชื่อ, tag, คำอธิบาย...">
@@ -527,7 +523,6 @@ service cloud.firestore {
       });
       setStatus(true, '✅ เชื่อมต่อ Firebase สำเร็จ (project: ' + config.projectId + ')');
       subscribeToPages();
-      checkLegacyImport();
     }catch(e){
       console.error('Firebase init error', e);
       db = null;
