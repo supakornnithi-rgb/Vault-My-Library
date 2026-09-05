@@ -14,7 +14,7 @@
   pass straight through to the network.
 */
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL_CACHE = `vault-shell-${VERSION}`;
 const FONT_CACHE = `vault-fonts-${VERSION}`;
 
@@ -91,11 +91,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // App shell navigations: try network, fall back to the cached shell so the
-  // SPA still boots when the device is offline.
+  // App shell navigations: always fetch fresh from the network (bypassing
+  // HTTP cache, so a new deploy is picked up immediately instead of showing
+  // a stale cached page), falling back to the cached shell only when truly
+  // offline.
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req).catch(() => caches.match('./html-vault.html'))
+      fetch(req, { cache: 'no-store' }).catch(() => caches.match('./html-vault.html'))
     );
     return;
   }
